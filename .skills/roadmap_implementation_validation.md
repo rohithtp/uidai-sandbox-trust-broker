@@ -37,9 +37,19 @@ Review each phase of the roadmap sequentially and perform the following checks:
 - Check services and controllers for `TODO` comments or stubbed logic.
 - Verify logic for key components (e.g., token translation, signature verification).
 
-### 4. Reporting
-Generate a structured report (markdown) that summarizes:
+### 4. Reporting & Synchronization
+
+Execute the following updates to ensure documentation remains in sync with the audit findings:
+
+#### A. Update Source Roadmap
+Update the primary blueprint or roadmap file (`docs/plan/uidai-sandbox-trust-broker-blueprint.md` or similar) to synchronize status tags:
+- Change `(Next)` to `(In-Progress)` or `(Complete)` as appropriate.
+- Add implementation notes (e.g., "(Implemented)", "(Partially Started)").
+
+#### B. Generate/Update Validation Report
+Update the detailed report (e.g., `docs/roadmap-validation-report.md`) including:
+- **Audit Metadata**: A `Last Validated` date and audit status.
 - **Completion Percentage** per phase.
-- **Implemented Features** list with checkboxes.
-- **Gaps & Sloped Logic**: Identify where code exists but is only a stub or interface.
-- **Recommended Next Steps**: Prioritize the next logical implementation tasks based on roadmap gaps.
+- **Detailed Checkboxes**: Checklist of implemented vs missing features.
+- **Gaps & Sloped Logic**: Explicitly list stubbed services or missing configuration.
+- **Recommended Next Steps**: Prioritized list of tasks to move the roadmap forward.
