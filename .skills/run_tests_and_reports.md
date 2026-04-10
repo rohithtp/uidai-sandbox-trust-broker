@@ -12,7 +12,7 @@ This project is a multi-module Maven project. Testing and reporting require a sp
 ### 1. Run Tests (XML/TXT Reports)
 To execute all JUnit tests and generate the standard Surefire XML/TXT reports (required for CI/CD integrations):
 ```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@25 && ./mvnw clean test
+export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home && export PATH=$JAVA_HOME/bin:$PATH && ./mvnw clean test
 ```
 *   **Output Location**: `[module-name]/target/surefire-reports/`
 *   **Files**: `TEST-*.xml`, `*.txt`
@@ -20,7 +20,7 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@25 && ./mvnw clean test
 ### 2. Generate HTML reports
 To generate the human-readable HTML Surefire reports for a visual summary of test results:
 ```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@25 && ./mvnw surefire-report:report
+export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home && export PATH=$JAVA_HOME/bin:$PATH && ./mvnw surefire-report:report
 ```
 *   **Output Location**: `[module-name]/target/reports/surefire.html`
 *   **Note**: This goal will use the existing test results or run tests if they haven't been run yet.
@@ -28,7 +28,7 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@25 && ./mvnw surefire-report:report
 ### 3. Full Cycle (Clean, Test, Report)
 To perform a complete clean build, run all tests, and generate both types of reports in a single command:
 ```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@25 && ./mvnw clean test surefire-report:report
+export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home && export PATH=$JAVA_HOME/bin:$PATH && ./mvnw clean test surefire-report:report
 ```
 
 ## Verification
