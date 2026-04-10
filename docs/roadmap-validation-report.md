@@ -12,8 +12,8 @@ This report summarizes the current implementation status of the `uidai-sandbox-t
 |---|---|---|---|
 | **Phase 1** | Baseline Services (Health, REST, OpenAPI) | **COMPLETED** | 100% |
 | **Phase 2** | `trust-broker-common` & DTO Normalization | **COMPLETED** | 100% |
-| **Phase 3** | Infrastructure Integration (Kafka & Redis) | **IN-PROGRESS** | 60% |
-| **Phase 4** | Centralized Auth Broker Logic | **NOT STARTED** | 0% |
+| **Phase 3** | Infrastructure Integration (Kafka & Redis) | **COMPLETED** | 100% |
+| **Phase 4** | Centralized Auth Broker Logic | **IN-PROGRESS** | 40% |
 
 ---
 
@@ -35,22 +35,24 @@ This report summarizes the current implementation status of the `uidai-sandbox-t
     - [x] Producer logic in `interoperability-gateway-service`.
     - [x] Consumer logic in `token-verification-and-translation-service`.
     - [x] Shared topic configuration via `KafkaTopicConfig`.
-- [ ] **Redis Caching**:
+- [x] **Redis Caching**:
     - [x] Connection properties defined in `application.properties`.
-    - [ ] **GAP**: No Java configuration or implementation logic found for Redis caching (JWKS or Token cache).
+    - [x] Java Configuration (`RedisCacheConfig.java`) implemented.
+    - [x] Cached JWKS Retrieval (`JwksService.java`) implemented using `@Cacheable`.
 
 ### Phase 4: Core Business Logic (Trust Broker)
-- [ ] **Gaps**: `TokenServiceImpl` is currently a placeholder returning generic success messages.
-- [ ] **Missing Logic**: No JWT signature validation or claim checking implementation yet.
-- [ ] **Missing Logic**: No multi-system routing logic implemented in the Gateway beyond Kafka publishing.
+- [x] **Token Verification**: `TokenServiceImpl.java` refactored to use standard `JwtDecoder`.
+- [x] **Signature Validation**: Implemented using custom `JWTProcessor` pointing to cached JWKS.
+- [ ] **Gap**: Multi-system routing logic (Registry lookup) not yet implemented in the Gateway.
+- [ ] **Missing Logic**: Advanced claim checking (Audience/Issuer validation) needs to be more granular.
 
 ---
 
 ## Gaps & Sloped Logic
-1.  **Stubbed Services**: `TokenServiceImpl.java` and `GatewayServiceImpl.java` contain the necessary interfaces but lack production-ready logic (e.g., signature verification).
-2.  **Redis Absence**: While Redis is available in Docker and config, it is not yet utilized by the application code for caching.
+1.  **Gateway Routing**: `GatewayServiceImpl.java` publishes to Kafka but lacks registry-based routing to distinguish between different trust levels of external systems.
+2.  **Token Service Granularity**: While basic signature verification is implemented, fine-grained claim mapping for specific UIDAI internal systems is still in the early stages.
 
 ## Recommended Next Steps
-1.  **Phase 3 Implementation (Redis)**: Implement `RedisConfig.java` and integrate caching for JWKS/Tokens to meet infrastructure goals.
-2.  **Phase 4 Business Logic**: Shift focus to `TokenServiceImpl` to implement actual JWT validation using standard security libraries.
+1.  **System Registry**: Implement a registry service to track external system trust levels and routing rules.
+2.  **Advanced Claim Mapping**: Enhance `TokenServiceImpl` to map specific external claims to UIDAI standard attributes.
 3.  **End-to-End Testing**: Create integration tests that verify a request flow from Gateway POST -> Kafka -> Token Service Verification -> Redis Cache.

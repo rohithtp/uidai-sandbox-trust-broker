@@ -74,6 +74,6 @@ uidai-sandbox-trust-broker/
 
 1. **Phase 1 (Complete)**: Baseline services with health checks and basic REST controllers.
 2. **Phase 2 (Complete)**: Establishment of `trust-broker-common` and shared DTO normalization.
-3. **Phase 3 (In-Progress)**: Integration of Kafka for event flow (Implemented) and Redis for JWKS caching (Next).
-4. **Phase 4 (Next)**: Implementation of the **Centralized Authentication Broker** logic—routing all inter-system requests through the Token Verification service to establish the "Trust Broker" layer.
+3. **Phase 3 (Complete)**: Integration of Kafka for event flow and Redis for JWKS caching.
+4. **Phase 4 (In-Progress)**: Implementation of the **Centralized Authentication Broker** logic—routing all inter-system requests through the Token Verification service to establish the "Trust Broker" layer.
 
