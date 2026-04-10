@@ -20,16 +20,21 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
 
     @Override
     public void sendTokenRequest(TokenRequest request) {
+        sendToTopic(KafkaTopicConfig.TOKEN_VERIFICATION_TOPIC, request);
+    }
+
+    @Override
+    public void sendToTopic(String topic, TokenRequest request) {
         log.info("Sending TokenRequest to Kafka topic: {} for system: {}", 
-                KafkaTopicConfig.TOKEN_VERIFICATION_TOPIC, request.getSystemId());
+                topic, request.getSystemId());
         
-        kafkaTemplate.send(KafkaTopicConfig.TOKEN_VERIFICATION_TOPIC, request.getSystemId(), request)
+        kafkaTemplate.send(topic, request.getSystemId(), request)
                 .whenComplete((result, ex) -> {
                     if (ex == null) {
-                        log.info("Successfully sent message with offset: {}", 
-                                result.getRecordMetadata().offset());
+                        log.info("Successfully sent message to topic {} with offset: {}", 
+                                topic, result.getRecordMetadata().offset());
                     } else {
-                        log.error("Unable to send message due to: {}", ex.getMessage());
+                        log.error("Unable to send message to topic {} due to: {}", topic, ex.getMessage());
                     }
                 });
     }

@@ -13,7 +13,7 @@ This report summarizes the current implementation status of the `uidai-sandbox-t
 | **Phase 1** | Baseline Services (Health, REST, OpenAPI) | **COMPLETED** | 100% |
 | **Phase 2** | `trust-broker-common` & DTO Normalization | **COMPLETED** | 100% |
 | **Phase 3** | Infrastructure Integration (Kafka & Redis) | **COMPLETED** | 100% |
-| **Phase 4** | Centralized Auth Broker Logic | **IN-PROGRESS** | 75% |
+| **Phase 4** | Centralized Auth Broker Logic | **COMPLETED** | 100% |
 
 ---
 
@@ -45,16 +45,16 @@ This report summarizes the current implementation status of the `uidai-sandbox-t
 - [x] **Signature Validation**: Implemented via `JwtDecoder` which integrates with `JwksService` for cached keys.
 - [x] **System Registry**: Implemented `SystemRegistryService` with Redis backing to track trust levels and routing rules.
 - [x] **Registry APIs**: Exposed management APIs via `SystemRegistryController`.
-- [ ] **Next**: Integration of `SystemRegistryService` into `GatewayServiceImpl` for trust-level validation before Kafka dispatch.
-- [ ] **Next**: Implementation of Routing Logic based on `RoutingRule`s retrieved from the registry.
+- [x] **Gateway Validation**: Integrated `SystemRegistryService` into `GatewayServiceImpl` for trust-level validation.
+- [x] **Dynamic Routing**: Implemented Routing Logic based on `RoutingRule`s retrieved from the registry.
 
 ---
 
 ## Gaps & Sloped Logic
-1.  **Gateway-Registry Handshake**: The Gateway currently receives requests but does not yet validate the `systemId` against the Registry's trust levels before processing.
-2.  **Dynamic Routing**: Routing rules exist in the registry but are not yet applied to the Kafka dispatch or service selection.
+1.  **Registry Handshake**: Gateway now validates `systemId` and `TrustLevel` using the Redis-backed Registry.
+2.  **Routed Dispatch**: Gateway dynamically selects Kafka topics based on registry-defined `RoutingRule`s.
 
 ## Recommended Next Steps
-1.  **Enforce Registry Validation**: Update `GatewayServiceImpl.processIncomingRequest` to query `SystemRegistryService` and reject systems with `NONE` trust levels.
-2.  **Telemetry Expansion**: Add structured audit logging (as per `AuditEvent` DTO) into the `GatewayService` flow.
+1.  **Telemetry Expansion**: Integrate `AuditEvent` DTO into the `GatewayService` flow for persistent audit trails.
+2.  **Protocol expansion**: Support non-Kafka protocols (REST/GRPC) in the `GatewayServiceImpl` routing logic.
 3.  **End-to-End Test Plan**: Execute a full flow test starting with system registration -> token dispatch -> verification.

@@ -12,4 +12,11 @@ public interface KafkaProducerService {
      * @param request The token request to send.
      */
     void sendTokenRequest(TokenRequest request);
+
+    /**
+     * Sends a TokenRequest event to a specific topic.
+     * @param topic The target Kafka topic.
+     * @param request The token request to send.
+     */
+    void sendToTopic(String topic, TokenRequest request);
 }
