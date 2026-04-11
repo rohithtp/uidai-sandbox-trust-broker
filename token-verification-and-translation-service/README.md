@@ -8,6 +8,17 @@ This service is the **core trust-processing engine** of the Trust Broker. It is 
 - **JWKS Caching**: Reducing latency by caching third-party signing keys in **Redis**.
 - **Asynchronous Consumption**: Processing token requests from **Kafka** topics.
 - **Format Translation**: Normalizing token payloads across service boundaries.
+- **Explicit Signing**: Issuing a new **Sandbox Session Token** that binds normalized identity claims (e.g., `normalizedName`) to a fresh, signed JWT.
+
+---
+
+## Token Translation Logic
+
+When a token is verified, the service doesn't just return the status. It "translates" the context into a new internal trust domain by:
+1.  **Extracting Identity**: Pulling claims like `sub` and `name` from the original token.
+2.  **Normalization**: Applying rules (e.g., uppercasing `name` to `normalizedName`).
+3.  **Binding**: Adding these normalized fields as claims to a **newly signed JWT** (the `translatedToken`).
+4.  **Issuance**: The resulting token is returned in the `translatedToken` field of the response, providing proof of authenticity within the sandbox.
 
 ---
 
