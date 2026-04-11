@@ -31,9 +31,11 @@ This service requires [Kafka and Redis](../docs/infrastructure-management.md) to
 |---|---|---|
 | `POST` | `/api/v1/registry/systems` | Register a new external system |
 | `GET` | `/api/v1/registry/systems` | List all registered systems |
+| `GET` | `/api/v1/registry/systems/{id}` | Get metadata for a specific system |
 | `PATCH` | `/api/v1/registry/systems/{id}/trust` | Update system trust level |
 | `POST` | `/api/v1/registry/rules` | Add a dynamic routing rule |
 | `GET` | `/api/v1/registry/systems/{id}/rules` | List rules for a system |
+| `DELETE` | `/api/v1/registry/rules/{id}` | Remove a routing rule |
 
 ---
 

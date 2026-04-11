@@ -107,7 +107,7 @@ Verify with a test token payload:
 ```bash
 curl -X POST http://localhost:8082/api/v1/token/verify \
   -H "Content-Type: application/json" \
-  -d '{"token": "<your-token-here>"}'
+  -d '{"systemId": "test-system", "token": "<your-token-here>"}'
 ```
 
 ---

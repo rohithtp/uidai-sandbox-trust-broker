@@ -43,8 +43,7 @@ curl -X POST http://localhost:8082/api/v1/token/verify \
   -H "Content-Type: application/json" \
   -d '{
     "systemId": "test-system",
-    "token": "<raw-token>",
-    "targetAudience": "uidai-auth"
+    "token": "<raw-token>"
   }'
 ```
 
@@ -58,6 +57,8 @@ curl -X POST http://localhost:8082/api/v1/token/verify \
     "systemId": "test-system",
     "subject": "sub-123456789",
     "trustLevel": "HIGH",
+    "normalizedName": "JOHN DOE",
+    "tokenIssued": "true",
     "processedAt": "2026-04-11T11:20:46Z",
     "expiresAt": "2026-04-11T12:20:46Z"
   }

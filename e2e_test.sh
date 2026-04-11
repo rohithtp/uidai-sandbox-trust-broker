@@ -37,10 +37,8 @@ echo -e "\nStep 3: Dispatching Token Request via Gateway..."
 curl -s -X POST "$GATEWAY_URL/gateway/process" \
   -H "Content-Type: application/json" \
   -d '{
-    "requestId": "REQ-1001",
     "systemId": "UIDAI-SND-001",
-    "tokenPayload": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoyNjA0MTEwMjAyfQ.dummy-signature",
-    "authType": "OIDC"
+    "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoyNjA0MTEwMjAyfQ.dummy-signature"
   }' | json_pp
 
 echo -e "\n=== E2E Test Flow Completed ==="
