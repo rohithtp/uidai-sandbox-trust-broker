@@ -4,23 +4,36 @@ Part of the [UIDAI Sandbox Trust Broker](../README.md).
 
 This service acts as the **entry point** for external systems interacting with the Trust Broker. It is responsible for:
 
-- Accepting inbound requests from heterogeneous systems
-- Adapting and routing requests to downstream Trust Broker services
-- Abstracting protocol and format differences from callers
+- **Auth Handshake**: Validating external systems via the **System Registry**.
+- **Dynamic Routing**: Dispatched requests to Kafka topics based on registry-defined rules.
+- **Protocol Adaptation**: Abstracting protocol and format differences from callers.
 
 ---
 
-## Prerequisites
+## Infrastructure
 
 This service requires [Kafka and Redis](../docs/infrastructure-management.md) to be running.
+- **Redis**: Stores the System Registry (External Systems and Routing Rules).
+- **Kafka**: Destinations for routed token requests.
+
+---
 
 ## Endpoints
 
+### Gateway API
 | Method | Path | Description |
 |---|---|---|
 | `GET` | `/api/v1/gateway/health` | Service health check |
+| `POST` | `/api/v1/gateway/process` | Accept and route a token request |
 
-> Additional routing and gateway endpoints will be added here as the service evolves.
+### System Registry API (Management)
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/v1/registry/systems` | Register a new external system |
+| `GET` | `/api/v1/registry/systems` | List all registered systems |
+| `PATCH` | `/api/v1/registry/systems/{id}/trust` | Update system trust level |
+| `POST` | `/api/v1/registry/rules` | Add a dynamic routing rule |
+| `GET` | `/api/v1/registry/systems/{id}/rules` | List rules for a system |
 
 ---
 
@@ -29,7 +42,8 @@ This service requires [Kafka and Redis](../docs/infrastructure-management.md) to
 | Property | Default | Description |
 |---|---|---|
 | `server.port` | `8081` | HTTP listener port |
-| `spring.application.name` | `interoperability-gateway-service` | Service name (used in logs and tracing) |
+| `spring.data.redis.host` | `localhost` | Redis host for registry storage |
+| `spring.kafka.bootstrap-servers` | `localhost:9092` | Kafka broker address |
 
 Configuration lives in [`src/main/resources/application.properties`](src/main/resources/application.properties).
 
@@ -38,29 +52,41 @@ Configuration lives in [`src/main/resources/application.properties`](src/main/re
 ## Running Locally
 
 From the module root:
-
 ```bash
 mvn spring-boot:run
 ```
 
-Or from the project root:
-
-```bash
-mvn spring-boot:run -pl interoperability-gateway-service
-```
-
-Health check:
+### Health check:
 ```bash
 curl http://localhost:8081/api/v1/gateway/health
-# → {"service":"interoperability-gateway-service","status":"UP"}
+```
+
+### Process Request (Example):
+```bash
+curl -X POST http://localhost:8081/api/v1/gateway/process \
+  -H "Content-Type: application/json" \
+  -d '{
+    "systemId": "test-system",
+    "token": "raw.jwt.token",
+    "targetAudience": "uidai-auth"
+  }'
 ```
 
 ---
 
-## Running Tests
+## Package Structure
 
-```bash
-mvn test
+```
+com.uidai.sandbox.gateway
+├── InteroperabilityGatewayApplication.java
+├── controller/
+│   ├── GatewayController.java         ← Entry point routing
+│   └── SystemRegistryController.java  ← Management APIs
+├── service/
+│   ├── GatewayService.java            ← Dispatch logic
+│   └── SystemRegistryService.java     ← Redis-backed registry
+└── config/
+    └── RedisConfig.java               ← Registry persistence config
 ```
 
 ---
@@ -69,32 +95,7 @@ mvn test
 
 | Dependency | Purpose |
 |---|---|
-| `spring-boot-starter-web` | REST API support (embedded Tomcat) |
-| `spring-boot-starter-test` | JUnit 5, Mockito, MockMvc |
-
----
-
-## Package Structure
-
-```
-com.uidai.sandbox.gateway
-├── InteroperabilityGatewayApplication.java   ← Spring Boot entry point
-└── controller/
-    └── GatewayController.java                ← REST controllers
-```
-
-> Follow a **package-by-feature** layout as the service grows (e.g., `routing/`, `adapter/`, `config/`).
-
----
-
-## Extension Points
-
-- **Add routing logic** in a new `routing/` package to forward requests to the token service or other backends.
-- **Add filters/interceptors** in a `filter/` package for request logging, rate limiting, or header validation.
-- **Add Spring Actuator** for production-grade health, metrics, and info endpoints:
-  ```xml
-  <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-  </dependency>
-  ```
+| `trust-broker-common` | Shared DTOs and Kafka config |
+| `spring-boot-starter-data-redis` | Registry persistence |
+| `spring-kafka` | Event-driven dispatch |
+| `springdoc-openapi-starter-webmvc-ui` | Swagger UI documentation |

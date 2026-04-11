@@ -8,8 +8,9 @@ A multi-module Spring Boot project that provides a **Trust Broker** layer for UI
 
 | Module | Port | Responsibility |
 |---|---|---|
-| [`interoperability-gateway-service`](./interoperability-gateway-service/README.md) | `8081` | Entry point for inter-system requests; routes and adapts protocol differences |
-| [`token-verification-and-translation-service`](./token-verification-and-translation-service/README.md) | `8082` | Verifies token authenticity and translates formats between identity providers |
+| [`interoperability-gateway-service`](./interoperability-gateway-service/README.md) | `8081` | Entry point for inter-system requests; routes and adapts protocol differences. Includes the **System Registry** for trust management. |
+| [`token-verification-and-translation-service`](./token-verification-and-translation-service/README.md) | `8082` | Verifies token authenticity (JWT/JWKS) and translates formats between identity providers. |
+| [`trust-broker-common`](./trust-broker-common/README.md) | N/A | Shared DTOs, Kafka configurations, and common error handlers. |
 
 ---
 
@@ -122,6 +123,27 @@ All services provide interactive API documentation via Swagger UI. Once the serv
 
 ---
 
+## End-to-End Validation
+
+The project includes an E2E validation script that tests the entire flow from system registration to token verification.
+
+### Run E2E Tests
+
+Ensure all services (Kafka, Redis, and Java Apps) are running, then:
+
+```bash
+chmod +x e2e_test.sh
+./e2e_test.sh
+```
+
+This script validates:
+1.  **System Registration**: Adding external systems to the central registry.
+2.  **Routing Rules**: Defining Kafka-based routing topics dynamically.
+3.  **Gateway Dispatch**: Sending a token request through the gateway.
+4.  **Verification Flow**: Full vertical verification across services.
+
+---
+
 ## Running Tests
 
 ```bash
@@ -131,6 +153,11 @@ mvn test
 # Single module
 mvn test -pl interoperability-gateway-service
 ```
+
+### Validation Reports
+Detailed implementation and testing reports are available in the [`docs/`](./docs/) directory:
+- [Roadmap Validation Report](./docs/roadmap-validation-report.md)
+- [Architecture Blueprint](./docs/blueprints/architecture-blueprint.md)
 
 ---
 
