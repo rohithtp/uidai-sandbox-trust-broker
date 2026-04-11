@@ -37,6 +37,22 @@ curl -X POST http://localhost:8082/api/v1/token/verify \
   }'
 ```
 
+### Example Response
+```json
+{
+  "status": "VERIFIED",
+  "message": "Token successfully verified and translated for test-system",
+  "translatedToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6InNhbmRib3gtayJ9...",
+  "details": {
+    "systemId": "test-system",
+    "subject": "sub-123456789",
+    "trustLevel": "HIGH",
+    "processedAt": "2026-04-11T11:20:46Z",
+    "expiresAt": "2026-04-11T12:20:46Z"
+  }
+}
+```
+
 ---
 
 ## Configuration

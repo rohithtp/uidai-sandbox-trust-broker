@@ -4,10 +4,10 @@ import com.uidai.sandbox.common.dto.TokenRequest;
 import com.uidai.sandbox.common.dto.TokenResponse;
 import com.uidai.sandbox.token.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -21,9 +21,11 @@ import java.util.Optional;
 public class TokenServiceImpl implements TokenService {
 
     private final JwtDecoder jwtDecoder;
+    private final JwtEncoder jwtEncoder;
 
-    public TokenServiceImpl(JwtDecoder jwtDecoder) {
+    public TokenServiceImpl(JwtDecoder jwtDecoder, JwtEncoder jwtEncoder) {
         this.jwtDecoder = jwtDecoder;
+        this.jwtEncoder = jwtEncoder;
     }
 
     @Override
@@ -38,12 +40,26 @@ public class TokenServiceImpl implements TokenService {
 
             // 2. Check token expiration and claims (handled by decoder, but can be expanded)
             
-            // 3. Translate foreign token structure to standardized UIDAI internal DTO
+            // 3. Translate/Issue Sandbox Session Token
+            Instant now = Instant.now();
+            JwtClaimsSet claims = JwtClaimsSet.builder()
+                    .issuer("uidai-trust-broker")
+                    .issuedAt(now)
+                    .expiresAt(now.plus(Duration.ofMinutes(30)))
+                    .subject(jwt.getSubject())
+                    .claim("originSystem", request.getSystemId())
+                    .claim("trustLevel", "HIGH")
+                    .build();
+
+            String sessionToken = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+
+            // 4. Build standardized UIDAI internal DTO
             return TokenResponse.builder()
                     .status("VERIFIED")
-                    .message("Token successfully verified for " + request.getSystemId())
+                    .message("Token successfully verified and translated for " + request.getSystemId())
+                    .translatedToken(sessionToken)
                     .details(Map.of(
-                            "processedAt", Instant.now().toString(),
+                            "processedAt", now.toString(),
                             "systemId", request.getSystemId(),
                             "subject", jwt.getSubject(),
                             "trustLevel", "HIGH",
