@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 # Configuration
 GATEWAY_URL="http://localhost:8081/api/v1"
@@ -6,20 +7,31 @@ TOKEN_URL="http://localhost:8082/api/v1"
 
 echo "=== Starting E2E Test Flow ==="
 
+# Helper: pretty-print JSON if available, else raw output
+pretty() {
+  if command -v python3 &>/dev/null; then
+    python3 -m json.tool 2>/dev/null || cat
+  else
+    cat
+  fi
+}
+
 # 1. System Registration
+echo ""
 echo "Step 1: Registering External System..."
-curl -s -X POST "$GATEWAY_URL/registry/systems" \
+curl -sf -X POST "$GATEWAY_URL/registry/systems" \
   -H "Content-Type: application/json" \
   -d '{
     "systemId": "UIDAI-SND-001",
     "systemName": "Sandbox Consumer 001",
     "trustLevel": "HIGH",
     "active": true
-  }' | json_pp
+  }' | pretty
 
 # 2. Add Routing Rule
-echo -e "\nStep 2: Adding Routing Rule..."
-curl -s -X POST "$GATEWAY_URL/registry/rules" \
+echo ""
+echo "Step 2: Adding Routing Rule..."
+curl -sf -X POST "$GATEWAY_URL/registry/rules" \
   -H "Content-Type: application/json" \
   -d '{
     "ruleId": "RULE-001",
@@ -28,17 +40,19 @@ curl -s -X POST "$GATEWAY_URL/registry/rules" \
     "targetTopic": "token-verification-topic",
     "protocol": "KAFKA",
     "active": true
-  }' | json_pp
+  }' | pretty
 
 # 3. Token Dispatch (via Gateway)
-echo -e "\nStep 3: Dispatching Token Request via Gateway..."
-# Note: The Gateway internally sends to Kafka, but the current implementation might be returning the result if it's synchronous or just a placeholder.
-# In a real async flow, the response might be 'ACCEPTED'.
-curl -s -X POST "$GATEWAY_URL/gateway/process" \
+echo ""
+echo "Step 3: Dispatching Token Request via Gateway..."
+# The Gateway looks up the routing rule for UIDAI-SND-001 and publishes the
+# token to the configured Kafka topic. The response is an immediate ACK.
+curl -sf -X POST "$GATEWAY_URL/gateway/process" \
   -H "Content-Type: application/json" \
   -d '{
     "systemId": "UIDAI-SND-001",
     "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoyNjA0MTEwMjAyfQ.dummy-signature"
-  }' | json_pp
+  }' | pretty
 
-echo -e "\n=== E2E Test Flow Completed ==="
+echo ""
+echo "=== E2E Test Flow Completed ==="
