@@ -37,7 +37,7 @@ curl -sf -X POST "$GATEWAY_URL/registry/rules" \
     "ruleId": "RULE-001",
     "systemId": "UIDAI-SND-001",
     "priority": 1,
-    "targetTopic": "token-verification-topic",
+    "targetEndpoint": "trust-broker.token.verification",
     "protocol": "KAFKA",
     "active": true
   }' | pretty
