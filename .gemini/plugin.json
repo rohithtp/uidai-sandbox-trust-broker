@@ -1,0 +1,5 @@
+{
+  "name": "uidai-trust-broker-plugin",
+  "description": "Local plugin providing project context and skills for the UIDAI Sandbox Trust Broker.",
+  "version": "1.0.0"
+}
