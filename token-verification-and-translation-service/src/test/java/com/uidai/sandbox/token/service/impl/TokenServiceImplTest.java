@@ -2,6 +2,7 @@ package com.uidai.sandbox.token.service.impl;
 
 import com.uidai.sandbox.common.dto.TokenRequest;
 import com.uidai.sandbox.common.dto.TokenResponse;
+import com.uidai.sandbox.common.dto.VerificationResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -51,12 +52,9 @@ class TokenServiceImplTest {
         when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(outgoingJwt);
 
         // 3. Execute
-        TokenRequest request = TokenRequest.builder()
-                .token("incoming-jwt")
-                .systemId("TEST-SYS")
-                .build();
+        TokenRequest request = new TokenRequest("incoming-jwt", "TEST-SYS");
         
-        TokenResponse response = tokenService.verifyAndTranslate(request);
+        VerificationResult result = tokenService.verifyAndTranslate(request);
 
         // 4. Verify explicit signing path
         ArgumentCaptor<JwtEncoderParameters> captor = ArgumentCaptor.forClass(JwtEncoderParameters.class);
@@ -72,9 +70,10 @@ class TokenServiceImplTest {
         assertEquals("UID-789", capturedClaims.getSubject());
         
         // CHECK: The response contains the token and metadata
-        assertEquals("VERIFIED", response.getStatus());
-        assertEquals("signed-session-token", response.getTranslatedToken());
-        assertEquals("JANE DOE", response.getDetails().get("normalizedName"));
+        assertTrue(result instanceof VerificationResult.Success);
+        VerificationResult.Success success = (VerificationResult.Success) result;
+        assertEquals("signed-session-token", success.sessionToken());
+        assertEquals("JANE DOE", success.details().get("normalizedName"));
         
         System.out.println("Verified: Additional field 'normalizedName' is bound to the NEWLY SIGNED token.");
     }
@@ -83,15 +82,12 @@ class TokenServiceImplTest {
     void testVerifyAndTranslate_Failure() {
         when(jwtDecoder.decode(anyString())).thenThrow(new BadJwtException("Invalid token"));
 
-        TokenRequest request = TokenRequest.builder()
-                .token("invalid")
-                .systemId("TEST-SYS")
-                .build();
+        TokenRequest request = new TokenRequest("invalid", "TEST-SYS");
         
-        TokenResponse response = tokenService.verifyAndTranslate(request);
+        VerificationResult result = tokenService.verifyAndTranslate(request);
 
-        assertEquals("FAILED", response.getStatus());
-        assertNull(response.getTranslatedToken());
-        assertTrue(response.getMessage().contains("Invalid token"));
+        assertTrue(result instanceof VerificationResult.Failure);
+        VerificationResult.Failure failure = (VerificationResult.Failure) result;
+        assertTrue(failure.reason().contains("Invalid token"));
     }
 }

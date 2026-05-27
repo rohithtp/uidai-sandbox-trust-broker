@@ -37,8 +37,8 @@ External System / Client
 
 ## Tech Stack
 
-- **Java 17**
-- **Spring Boot 3.2.0**
+- **Java 25** (LTS)
+- **Spring Boot 3.5.14**
 - **Maven** (multi-module build)
 
 ---
@@ -47,7 +47,7 @@ External System / Client
 
 | Tool | Minimum Version |
 |---|---|
-| JDK | 17 |
+| JDK | 25 |
 | Maven | 3.8+ |
 | Docker | Desktop (latest) |
 

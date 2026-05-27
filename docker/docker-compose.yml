@@ -1,4 +1,5 @@
-version: '3.8'
+# version key removed (deprecated in Compose V2)
+# Using JDK 25 images for services when containerised
 
 services:
   zookeeper:

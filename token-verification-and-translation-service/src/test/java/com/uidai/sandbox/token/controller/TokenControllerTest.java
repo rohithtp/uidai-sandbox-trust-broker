@@ -3,6 +3,7 @@ package com.uidai.sandbox.token.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uidai.sandbox.common.dto.TokenRequest;
 import com.uidai.sandbox.common.dto.TokenResponse;
+import com.uidai.sandbox.common.dto.VerificationResult;
 import com.uidai.sandbox.token.service.TokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,18 +52,11 @@ public class TokenControllerTest {
     @Test
     @WithMockUser
     public void testVerifyToken() throws Exception {
-        TokenRequest request = TokenRequest.builder()
-                .token("test-token")
-                .systemId("test-system")
-                .build();
+        TokenRequest request = new TokenRequest("test-token", "test-system");
 
-        TokenResponse response = TokenResponse.builder()
-                .status("VERIFIED")
-                .message("Token successfully processed")
-                .details(Map.of("systemId", "test-system"))
-                .build();
+        VerificationResult result = new VerificationResult.Success("subject", "session-token", Map.of("systemId", "test-system"));
 
-        when(tokenService.verifyAndTranslate(any(TokenRequest.class))).thenReturn(response);
+        when(tokenService.verifyAndTranslate(any(TokenRequest.class))).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/token/verify")
                 .with(csrf())
@@ -70,6 +64,6 @@ public class TokenControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("VERIFIED"))
-                .andExpect(jsonPath("$.message").value("Token successfully processed"));
+                .andExpect(jsonPath("$.message").value("Token successfully verified and translated"));
     }
 }

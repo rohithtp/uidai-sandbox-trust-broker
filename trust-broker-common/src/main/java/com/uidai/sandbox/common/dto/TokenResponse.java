@@ -1,19 +1,10 @@
 package com.uidai.sandbox.common.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.Map;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class TokenResponse {
-    private String status;
-    private String message;
-    private String translatedToken;
-    private Map<String, Object> details;
-}
+public record TokenResponse(
+    String status,
+    String message,
+    String translatedToken,
+    Map<String, Object> details
+) {}

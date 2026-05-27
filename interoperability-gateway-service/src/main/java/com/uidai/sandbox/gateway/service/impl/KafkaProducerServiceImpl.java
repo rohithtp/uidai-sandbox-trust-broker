@@ -26,9 +26,9 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
     @Override
     public void sendToTopic(String topic, TokenRequest request) {
         log.info("Sending TokenRequest to Kafka topic: {} for system: {}", 
-                topic, request.getSystemId());
+                topic, request.systemId());
         
-        kafkaTemplate.send(topic, request.getSystemId(), request)
+        kafkaTemplate.send(topic, request.systemId(), request)
                 .whenComplete((result, ex) -> {
                     if (ex == null) {
                         log.info("Successfully sent message to topic {} with offset: {}", 

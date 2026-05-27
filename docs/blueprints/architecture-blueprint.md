@@ -33,6 +33,19 @@ The Trust Broker is a multi-module Spring Boot application designed to facilitat
 - **Caching**: Redis (for token state and lookups).
 - **API Documentation**: OpenAPI/Swagger.
 
+## Component Flow
+1. **Source System** POSTs token request to the Gateway.
+2. Gateway checks **System Registry**, extracts `TrustLevel`, and evaluates **RoutingRules**.
+3. If allowed, Gateway publishes `TokenRequest` to Kafka `token-verification` topic.
+4. **Token Verification Service** consumes the Kafka message.
+5. Service fetches target JWKS (cached in Redis), verifies token signature, checks trust level.
+6. Service issues a new internal Sandbox Session Token and writes to Audit Log.
+
+## Platform & Runtime
+- **JDK**: 25 LTS (Virtual Threads, Records, Pattern Matching, Sealed Interfaces, Scoped Values)
+- **Spring Boot**: 3.5.14 (virtual thread auto-configuration, improved observability)
+- **Concurrency Model**: Virtual threads (`spring.threads.virtual.enabled=true`) for all I/O-bound request handling
+
 ## Data Flow
 1. Client sends request to **Gateway**.
 2. Gateway extracts tokens and calls **Token Service**.

@@ -1,7 +1,7 @@
 package com.uidai.sandbox.token.service;
 
 import com.uidai.sandbox.common.dto.TokenRequest;
-import com.uidai.sandbox.common.dto.TokenResponse;
+import com.uidai.sandbox.common.dto.VerificationResult;
 
 /**
  * Service interface for token verification and translation.
@@ -14,5 +14,5 @@ public interface TokenService {
      * @param request the token request containing the raw token and system identifier
      * @return a normalized token response
      */
-    TokenResponse verifyAndTranslate(TokenRequest request);
+    VerificationResult verifyAndTranslate(TokenRequest request);
 }

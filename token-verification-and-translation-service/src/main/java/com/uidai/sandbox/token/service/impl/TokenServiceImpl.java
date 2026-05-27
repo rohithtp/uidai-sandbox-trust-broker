@@ -2,6 +2,7 @@ package com.uidai.sandbox.token.service.impl;
 
 import com.uidai.sandbox.common.dto.TokenRequest;
 import com.uidai.sandbox.common.dto.TokenResponse;
+import com.uidai.sandbox.common.dto.VerificationResult;
 import com.uidai.sandbox.token.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.jwt.*;
@@ -29,12 +30,12 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public TokenResponse verifyAndTranslate(TokenRequest request) {
-        log.info("Processing token verification for System ID: {}", request.getSystemId());
+    public VerificationResult verifyAndTranslate(TokenRequest request) {
+        log.info("Processing token verification for System ID: {}", request.systemId());
 
         try {
             // 1. Validate JWT signature using JWKS (cached in Redis via SecurityConfig/JwksService)
-            Jwt jwt = jwtDecoder.decode(request.getToken());
+            Jwt jwt = jwtDecoder.decode(request.token());
             
             log.info("Token verified successfully for subject: {}", jwt.getSubject());
 
@@ -51,7 +52,7 @@ public class TokenServiceImpl implements TokenService {
                     .issuedAt(now)
                     .expiresAt(now.plus(Duration.ofMinutes(30)))
                     .subject(jwt.getSubject())
-                    .claim("originSystem", request.getSystemId())
+                    .claim("originSystem", request.systemId())
                     .claim("trustLevel", "HIGH")
                     .claim("tokenType", "SANDBOX_SESSION_TOKEN")
                     .claim("normalizedName", normalizedName) // Proof: This is added to the signed token
@@ -62,32 +63,22 @@ public class TokenServiceImpl implements TokenService {
             log.info("Issued new Sandbox Session Token for {} with normalized name: {}", jwt.getSubject(), normalizedName);
 
             // 4. Build standardized UIDAI internal DTO
-            return TokenResponse.builder()
-                    .status("VERIFIED")
-                    .message("Token successfully verified and translated for " + request.getSystemId())
-                    .translatedToken(sessionToken)
-                    .details(Map.of(
+            return new VerificationResult.Success(
+                    jwt.getSubject(),
+                    sessionToken,
+                    Map.of(
                             "processedAt", now.toString(),
-                            "systemId", request.getSystemId(),
-                            "subject", jwt.getSubject(),
+                            "systemId", request.systemId(),
                             "trustLevel", "HIGH",
                             "normalizedName", normalizedName,
                             "tokenIssued", "true",
                             "expiresAt", Optional.ofNullable(jwt.getExpiresAt()).map(Instant::toString).orElse("N/A")
-                    ))
-                    .build();
+                    )
+            );
                     
         } catch (Exception e) {
-            log.error("Token verification failed for system {}: {}", request.getSystemId(), e.getMessage());
-            return TokenResponse.builder()
-                    .status("FAILED")
-                    .message("Token verification failed: " + e.getMessage())
-                    .details(Map.of(
-                            "processedAt", Instant.now().toString(),
-                            "systemId", request.getSystemId(),
-                            "trustLevel", "NONE"
-                    ))
-                    .build();
+            log.error("Token verification failed for system {}: {}", request.systemId(), e.getMessage());
+            return new VerificationResult.Failure(e.getMessage(), request.systemId());
         }
     }
 }

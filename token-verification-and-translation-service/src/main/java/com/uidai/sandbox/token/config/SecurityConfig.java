@@ -24,6 +24,11 @@ public class SecurityConfig {
     private final JwksService jwksService;
 
     public SecurityConfig(JwksService jwksService) {
+        // JDK 25: validation before field assignment (flexible constructor)
+        if (jwksService == null) {
+            throw new IllegalArgumentException("JwksService must not be null");
+        }
+        super();
         this.jwksService = jwksService;
     }
 
@@ -81,6 +86,8 @@ public class SecurityConfig {
     }
 
     private static KeyPair generateRsaKey() {
+        // TODO (JDK 25 KDF API): Future integration for HKDF-based symmetric key derivation 
+        // when issuing specific sandbox session tokens, using javax.crypto.KDF.
         KeyPair keyPair;
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");

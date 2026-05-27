@@ -51,15 +51,9 @@ public class GatewayControllerTest {
     @Test
     @WithMockUser
     public void testProcessRequest() throws Exception {
-        TokenRequest request = TokenRequest.builder()
-                .token("test-token")
-                .systemId("test-system")
-                .build();
+        TokenRequest request = new TokenRequest("test-token", "test-system");
 
-        TokenResponse response = TokenResponse.builder()
-                .status("ACCEPTED")
-                .message("Request received")
-                .build();
+        TokenResponse response = new TokenResponse("ACCEPTED", "Request received", null, null);
 
         when(gatewayService.processIncomingRequest(any(TokenRequest.class))).thenReturn(response);
 

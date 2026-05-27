@@ -77,4 +77,5 @@ uidai-sandbox-trust-broker/
 3. **Phase 3 (Complete)**: Integration of Kafka for event flow and Redis for JWKS caching.
 4. **Phase 4 (Complete)**: Implementation of the **Centralized Authentication Broker** logic—routing all inter-system requests through the Token Verification service to establish the "Trust Broker" layer. (Registry validation and Routing implemented)
 5. **Phase 5 (Complete)**: Full lifecycle validation, including universal Maven build verification and End-to-End flow testing (Registry -> Gateway -> Kafka -> Token Service).
-
+6. **Phase 6 (Complete)**: **JDK 25 LTS Platform Upgrade** — Upgrade build toolchain to Java 25, Spring Boot 3.5.14, and all dependencies. Enable Virtual Threads for I/O-bound services. Update Docker base images.
+7. **Phase 7 (Complete)**: **JDK 25 Language Modernisation** — Convert immutable DTOs to Java Records. Introduce sealed interfaces for typed verification results. Adopt pattern-matching switch. Integrate Scoped Values for request context. Leverage Sequenced Collections and Flexible Constructor Bodies.

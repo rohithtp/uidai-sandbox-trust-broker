@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.UUID;
+import java.lang.ScopedValue;
+import com.uidai.sandbox.common.context.RequestContext;
 
 /**
  * Controller for the Interoperability Gateway, handling entry-point routing and health.
@@ -29,7 +32,15 @@ public class GatewayController {
     @Operation(summary = "Process Incoming Request", description = "Accepts requests from external systems and routes them for verification and translation.")
     @PostMapping("/process")
     public ResponseEntity<TokenResponse> processRequest(@RequestBody TokenRequest request) {
-        return ResponseEntity.ok(gatewayService.processIncomingRequest(request));
+        try {
+            return ScopedValue.where(RequestContext.SYSTEM_ID, request.systemId())
+                    .where(RequestContext.CORRELATION_ID, UUID.randomUUID().toString())
+                    .call(() -> ResponseEntity.ok(gatewayService.processIncomingRequest(request)));
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Operation(summary = "Health Check", description = "Returns the status of the Interoperability Gateway service.")

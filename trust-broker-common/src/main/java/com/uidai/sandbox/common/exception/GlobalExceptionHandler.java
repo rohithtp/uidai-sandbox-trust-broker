@@ -14,23 +14,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
-        ErrorResponse error = ErrorResponse.builder()
-                .message(ex.getMessage())
-                .errorCode("INTERNAL_SERVER_ERROR")
-                .timestamp(LocalDateTime.now())
-                .path(request.getDescription(false))
-                .build();
+        ErrorResponse error = new ErrorResponse(
+                ex.getMessage(),
+                "INTERNAL_SERVER_ERROR",
+                LocalDateTime.now(),
+                request.getDescription(false)
+        );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException ex, WebRequest request) {
-        ErrorResponse error = ErrorResponse.builder()
-                .message(ex.getMessage())
-                .errorCode("BAD_REQUEST")
-                .timestamp(LocalDateTime.now())
-                .path(request.getDescription(false))
-                .build();
+        ErrorResponse error = new ErrorResponse(
+                ex.getMessage(),
+                "BAD_REQUEST",
+                LocalDateTime.now(),
+                request.getDescription(false)
+        );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

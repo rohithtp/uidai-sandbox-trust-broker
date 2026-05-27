@@ -15,6 +15,8 @@ This report summarizes the current implementation status of the `uidai-sandbox-t
 | **Phase 3** | Infrastructure Integration (Kafka & Redis) | **COMPLETED** | 100% |
 | **Phase 4** | Centralized Auth Broker Logic | **COMPLETED** | 100% |
 | **Phase 5** | Validation & E2E Testing | **COMPLETED** | 100% |
+| **Phase 6** | JDK 25 LTS Platform Upgrade | **COMPLETED** | 100% |
+| **Phase 7** | JDK 25 Language Modernisation | **COMPLETED** | 100% |
 
 ---
 
@@ -54,6 +56,20 @@ This report summarizes the current implementation status of the `uidai-sandbox-t
 - [x] **JUnit Coverage**: Verified all service-level tests and controller tests pass in the sandbox environment.
 - [x] **End-to-End Flow**: Successfully executed a full vertical flow (System Registration -> Routing Rule Addition -> Gateway Dispatch -> Kafka Consumption).
 - [x] **Infrastructure Resilience**: Verified Kafka and Redis integration under live flow conditions.
+
+### Phase 6: JDK 25 LTS Platform Upgrade
+- [x] **Build Toolchain**: Upgraded Maven compiler plugin and root POM to `-source 25 -target 25`.
+- [x] **Dependencies**: Spring Boot bumped to 3.5.14, Nimbus JOSE JWT to 10.9 (CVE fixed).
+- [x] **Virtual Threads**: Enabled via `spring.threads.virtual.enabled=true` for all Spring Web and Kafka IO.
+- [x] **Docker Infrastructure**: Removed deprecated version key from `docker-compose.yml`.
+
+### Phase 7: JDK 25 Language Modernisation
+- [x] **Records**: Migrated immutable DTOs (`TokenRequest`, `TokenResponse`, etc.) to Java Records.
+- [x] **Sealed Interfaces**: Created `VerificationResult` to strictly define service outcomes.
+- [x] **Pattern Matching**: Adopted exhaustible `switch` expressions across controller and service boundaries.
+- [x] **Scoped Values**: Replaced parameter threading with `ScopedValue` for system/correlation IDs.
+- [x] **Sequenced Collections**: Replaced Streams sorting with `routingRules.getFirst()`.
+- [x] **Constructor Flexibility**: Validated parameters before `super()` assignment.
 
 ---
 
